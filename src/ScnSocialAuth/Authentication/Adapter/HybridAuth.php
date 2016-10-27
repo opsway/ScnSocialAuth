@@ -54,8 +54,9 @@ class HybridAuth extends AbstractAdapter implements EventManagerAwareInterface
      */
     protected $events;
 
-    public function authenticate(Event $authEvent)
+    public function authenticate(Event $event)
     {
+        $authEvent = $event->getTarget();
         if ($this->isSatisfied()) {
             $storage = $this->getStorage()->read();
             $authEvent->setIdentity($storage['identity'])
