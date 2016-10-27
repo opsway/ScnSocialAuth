@@ -42,7 +42,7 @@ class UserControllerFactory implements FactoryInterface
         $redirectCallback = $container->get('zfcuser_redirect_callback');
         $zfcuserModuleOptions = $container->get('zfcuser_module_options');
 
-        $controller = new UserController($redirectCallback);
+        $controller = new UserController($redirectCallback, $container);
         $controller->setMapper($mapper);
         $controller->setOptions($moduleOptions);
         $controller->setZfcModuleOptions($zfcuserModuleOptions);

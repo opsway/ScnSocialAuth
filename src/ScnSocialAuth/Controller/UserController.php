@@ -41,16 +41,24 @@ class UserController extends AbstractActionController
      * @var callable $redirectCallback
      */
     protected $redirectCallback;
+    protected $container;
 
     /**
      * @param callable $redirectCallback
+     * @param          $container
      */
-    public function __construct($redirectCallback)
+    public function __construct($redirectCallback, $container)
     {
         if (!is_callable($redirectCallback)) {
             throw new \InvalidArgumentException('You must supply a callable redirectCallback');
         }
         $this->redirectCallback = $redirectCallback;
+        $this->container = $container;
+    }
+
+    public function getServiceLocator()
+    {
+        return $this->container;
     }
 
     public function addProviderAction()
