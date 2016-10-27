@@ -1,163 +1,173 @@
 <?php
-return array(
-    'controllers' => array(
-        'factories' => array(
-            'ScnSocialAuth-HybridAuth' => 'ScnSocialAuth\Service\HybridAuthControllerFactory',
-            'ScnSocialAuth-User' => 'ScnSocialAuth\Service\UserControllerFactory',
-        ),
-    ),
-    'controller_plugins' => array(
-        'invokables' => array(
-            'scnsocialauthprovider' => 'ScnSocialAuth\Controller\Plugin\ScnSocialAuthProvider',
-        ),
-    ),
-    'router' => array(
-        'routes' => array(
-            'scn-social-auth-hauth' => array(
+
+namespace ScnSocialAuth;
+
+use Zend\ServiceManager\Factory\InvokableFactory;
+
+return [
+    'controllers' => [
+        'factories' => [
+            'ScnSocialAuth-HybridAuth' => Service\HybridAuthControllerFactory::class,
+            'ScnSocialAuth-User' => Service\UserControllerFactory::class,
+        ],
+    ],
+    'controller_plugins' => [
+        'aliases' => [
+            'scnsocialauthprovider' => Controller\Plugin\ScnSocialAuthProvider::class,
+            'scnSocialAuthProvider' => Controller\Plugin\ScnSocialAuthProvider::class,
+        ],
+        'factories' => [
+            Controller\Plugin\ScnSocialAuthProvider::class => Service\ScnSocialAuthProviderFactory::class,
+        ],
+    ],
+    'router' => [
+        'routes' => [
+            'scn-social-auth-hauth' => [
                 'type'    => 'Literal',
                 'priority' => 2000,
-                'options' => array(
+                'options' => [
                     'route' => '/scn-social-auth/hauth',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => 'ScnSocialAuth-HybridAuth',
                         'action'     => 'index',
-                    ),
-                ),
-            ),
-            'scn-social-auth-user' => array(
+                    ],
+                ],
+            ],
+            'scn-social-auth-user' => [
                 'type' => 'Literal',
                 'priority' => 2000,
-                'options' => array(
+                'options' => [
                     'route' => '/user',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => 'zfcuser',
                         'action'     => 'index',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'authenticate' => array(
+                'child_routes' => [
+                    'authenticate' => [
                         'type' => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => '/authenticate',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'zfcuser',
                                 'action'     => 'authenticate',
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => true,
-                        'child_routes' => array(
-                            'provider' => array(
+                        'child_routes' => [
+                            'provider' => [
                                 'type' => 'Segment',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/:provider',
-                                    'constraints' => array(
+                                    'constraints' => [
                                         'provider' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                    ),
-                                    'defaults' => array(
+                                    ],
+                                    'defaults' => [
                                         'controller' => 'ScnSocialAuth-User',
                                         'action' => 'provider-authenticate',
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                    'login' => array(
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'login' => [
                         'type' => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => '/login',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'ScnSocialAuth-User',
                                 'action'     => 'login',
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => true,
-                        'child_routes' => array(
-                            'provider' => array(
+                        'child_routes' => [
+                            'provider' => [
                                 'type' => 'Segment',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/:provider',
-                                    'constraints' => array(
+                                    'constraints' => [
                                         'provider' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                    ),
-                                    'defaults' => array(
+                                    ],
+                                    'defaults' => [
                                         'controller' => 'ScnSocialAuth-User',
                                         'action' => 'provider-login',
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                    'logout' => array(
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'logout' => [
                         'type' => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => '/logout',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'ScnSocialAuth-User',
                                 'action'     => 'logout',
-                            ),
-                        ),
-                    ),
-                    'register' => array(
+                            ],
+                        ],
+                    ],
+                    'register' => [
                         'type' => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => '/register',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'ScnSocialAuth-User',
                                 'action'     => 'register',
-                            ),
-                        ),
-                    ),
-                    'add-provider' => array(
+                            ],
+                        ],
+                    ],
+                    'add-provider' => [
                         'type' => 'Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => '/add-provider',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'ScnSocialAuth-User',
                                 'action'     => 'add-provider',
-                            ),
-                        ),
-                        'child_routes' => array(
-                            'provider' => array(
+                            ],
+                        ],
+                        'child_routes' => [
+                            'provider' => [
                                 'type' => 'Segment',
-                                'options' => array(
+                                'options' => [
                                     'route' => '/:provider',
-                                    'constraints' => array(
+                                    'constraints' => [
                                         'provider' => '[a-zA-Z][a-zA-Z0-9_-]+',
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    ),
-    'service_manager' => array(
-        'aliases' => array(
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'service_manager' => [
+        'aliases' => [
             'ScnSocialAuth_ZendDbAdapter' => 'Zend\Db\Adapter\Adapter',
             'ScnSocialAuth_ZendSessionManager' => 'Zend\Session\SessionManager',
-        ),
-        'factories' => array(
-            'HybridAuth' => 'ScnSocialAuth\Service\HybridAuthFactory',
-            'ScnSocialAuth-ModuleOptions' => 'ScnSocialAuth\Service\ModuleOptionsFactory',
-            'ScnSocialAuth-UserProviderMapper' => 'ScnSocialAuth\Service\UserProviderMapperFactory',
-            'ScnSocialAuth-AuthenticationAdapterChain' => 'ScnSocialAuth\Service\AuthenticationAdapterChainFactory',
-            'ScnSocialAuth\Authentication\Adapter\HybridAuth' => 'ScnSocialAuth\Service\HybridAuthAdapterFactory',
-            'zfcuser_redirect_callback' => 'ScnSocialAuth\Service\RedirectCallbackFactory',
-        ),
-    ),
-    'view_helpers' => array(
-        'invokables' => array(
-            'socialSignInButton' => 'ScnSocialAuth\View\Helper\SocialSignInButton',
-        ),
-        'factories' => array(
-            'scnUserProvider'   => 'ScnSocialAuth\Service\UserProviderViewHelperFactory',
-        ),
-    ),
-    'view_manager' => array(
-        'template_path_stack' => array(
+        ],
+        'factories' => [
+            'HybridAuth' => Service\HybridAuthFactory::class,
+            'ScnSocialAuth-ModuleOptions' => Service\ModuleOptionsFactory::class,
+            'ScnSocialAuth-UserProviderMapper' => Service\UserProviderMapperFactory::class,
+            'ScnSocialAuth-AuthenticationAdapterChain' => Service\AuthenticationAdapterChainFactory::class,
+            Authentication\Adapter\HybridAuth::class => Service\HybridAuthAdapterFactory::class,
+            'zfcuser_redirect_callback' => Service\RedirectCallbackFactory::class,
+        ],
+    ],
+    'view_helpers' => [
+        'aliases' => [
+            'socialSignInButton' => View\Helper\SocialSignInButton::class,
+        ],
+        'factories' => [
+            View\Helper\SocialSignInButton::class => InvokableFactory::class,
+            'scnUserProvider'   => Service\UserProviderViewHelperFactory::class,
+        ],
+    ],
+    'view_manager' => [
+        'template_path_stack' => [
             'scn-social-auth' => __DIR__ . '/../view'
-        ),
-    ),
-);
+        ],
+    ],
+];

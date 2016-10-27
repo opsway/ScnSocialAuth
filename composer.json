@@ -25,6 +25,7 @@
         "hybridauth/hybridauth": "^2.6"
     },
     "require-dev": {
+        "zendframework/zend-test": "^3.0",
         "mockery/mockery": "^0.8.0",
         "phpunit/phpunit": "^4.8"
     },

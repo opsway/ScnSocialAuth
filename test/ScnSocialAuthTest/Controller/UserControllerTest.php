@@ -49,7 +49,7 @@ class UserControllerTest extends TestCase
         $this->request = new Request();
         $this->controller = new UserController(\Mockery::mock('ScnSocialAuth\Controller\RedirectCallback'));
         $this->controller->setEvent($this->event);
-        $this->controller->setServiceLocator($this->sm);
+        //$this->controller->setServiceLocator($this->sm);
         $this->controller->setPluginManager($this->pm);
 
         $forwardPlugin = \Mockery::mock('Zend\Mvc\Controller\Plugin\Forward[dispatch]');
@@ -63,7 +63,7 @@ class UserControllerTest extends TestCase
 
     protected function dispatch($action, $params = array())
     {
-        $routeMatch = new \Zend\Mvc\Router\RouteMatch(array_merge(array('action' => $action), $params));
+        $routeMatch = new \Zend\Router\RouteMatch(array_merge(array('action' => $action), $params));
         $this->event->setRouteMatch($routeMatch);
         $this->controller->setEvent($this->event);
         $this->controller->dispatch($this->request);

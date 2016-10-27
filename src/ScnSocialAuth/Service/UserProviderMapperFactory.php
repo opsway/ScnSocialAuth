@@ -8,10 +8,13 @@
 
 namespace ScnSocialAuth\Service;
 
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
 use ScnSocialAuth\Mapper\UserProvider;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Stdlib\Hydrator;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\Hydrator;
 
 /**
  * @category   ScnSocialAuth
@@ -19,13 +22,26 @@ use Zend\Stdlib\Hydrator;
  */
 class UserProviderMapperFactory implements FactoryInterface
 {
-    public function createService(ServiceLocatorInterface $services)
+    /**
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $options = $services->get('ScnSocialAuth-ModuleOptions');
+        $options = $container->get('ScnSocialAuth-ModuleOptions');
         $entityClass = $options->getUserProviderEntityClass();
 
         $mapper = new UserProvider();
-        $mapper->setDbAdapter($services->get('ScnSocialAuth_ZendDbAdapter'));
+        $mapper->setDbAdapter($container->get('ScnSocialAuth_ZendDbAdapter'));
         $mapper->setEntityPrototype(new $entityClass);
         $mapper->setHydrator(new Hydrator\ClassMethods);
 

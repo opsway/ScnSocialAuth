@@ -8,9 +8,12 @@
 
 namespace ScnSocialAuth\Service;
 
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
 use ScnSocialAuth\Options;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * @category   ScnSocialAuth
@@ -18,10 +21,23 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class ModuleOptionsFactory implements FactoryInterface
 {
-    public function createService(ServiceLocatorInterface $services)
+    /**
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $services->get('Configuration');
+        $config = $container->get('Config');
 
-        return new Options\ModuleOptions(isset($config['scn-social-auth']) ? $config['scn-social-auth'] : array());
+        return new Options\ModuleOptions(isset($config['scn-social-auth']) ? $config['scn-social-auth'] : []);
     }
 }

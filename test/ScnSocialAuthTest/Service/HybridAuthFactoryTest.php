@@ -9,8 +9,8 @@ namespace ScnSocialAuthTest\Service;
 use ScnSocialAuth\Service\HybridAuthFactory;
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\Router\Http\TreeRouteStack;
-use Zend\Mvc\Router\Console\SimpleRouteStack;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Router\Http\SimpleRouteStack;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Uri\Http as HttpUri;
 

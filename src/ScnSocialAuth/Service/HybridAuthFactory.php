@@ -9,10 +9,12 @@
 namespace ScnSocialAuth\Service;
 
 use Hybrid_Auth;
-use Zend\Mvc\Router\Http\TreeRouteStack;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\Router\Http\TreeRouteStack;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * @category   ScnSocialAuth
@@ -20,176 +22,14 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class HybridAuthFactory implements FactoryInterface
 {
-    public function createService(ServiceLocatorInterface $services)
+    public function getBaseUrl(ContainerInterface $container)
     {
-        // Making sure the SessionManager is initialized
-        // before creating HybridAuth components
-        $sessionManager = $services->get('ScnSocialAuth_ZendSessionManager')->start();
-
-        /* @var $options \ScnSocialAuth\Options\ModuleOptions */
-        $options = $services->get('ScnSocialAuth-ModuleOptions');
-
-        $baseUrl = $this->getBaseUrl($services);
-
-        $hybridAuth = new Hybrid_Auth(
-            array(
-                'base_url' => $baseUrl,
-                "debug_mode" => $options->getDebugMode(),
-                "debug_file" => $options->getDebugFile(),
-                'providers' => array(
-                    'BitBucket' => array(
-                        'enabled' => $options->getBitbucketEnabled(),
-                        'keys' => array(
-                            'key' => $options->getBitbucketKey(),
-                            'secret' => $options->getBitbucketSecret(),
-                        ),
-                        'scope' => '',
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_BitBucket',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/BitBucket.php'),
-                        ),
-                    ),
-                    'Facebook' => array(
-                        'enabled' => $options->getFacebookEnabled(),
-                        'keys' => array(
-                            'id' => $options->getFacebookClientId(),
-                            'secret' => $options->getFacebookSecret(),
-                        ),
-                        'scope' => $options->getFacebookScope(),
-                        'display' => $options->getFacebookDisplay(),
-                        'trustForwarded' => $options->getFacebookTrustForwarded(),
-                    ),
-                    'Foursquare' => array(
-                        'enabled' => $options->getFoursquareEnabled(),
-                        'keys' => array(
-                            'id' => $options->getFoursquareClientId(),
-                            'secret' => $options->getFoursquareSecret(),
-                        ),
-                    ),
-                    'GitHub' => array(
-                        'enabled' => $options->getGithubEnabled(),
-                        'keys' => array(
-                            'id' => $options->getGithubClientId(),
-                            'secret' => $options->getGithubSecret(),
-                        ),
-                        'scope' => $options->getGithubScope(),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_GitHub',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/GitHub.php'),
-                        ),
-                    ),
-                    'Google' => array(
-                        'enabled' => $options->getGoogleEnabled(),
-                        'keys' => array(
-                            'id' => $options->getGoogleClientId(),
-                            'secret' => $options->getGoogleSecret(),
-                        ),
-                        'scope' => $options->getGoogleScope(),
-                        'hd' => $options->getGoogleHd(),
-                    ),
-                    'LinkedIn' => array(
-                        'enabled' => $options->getLinkedInEnabled(),
-                        'keys' => array(
-                            'key' => $options->getLinkedInClientId(),
-                            'secret' => $options->getLinkedInSecret(),
-                        ),
-                    ),
-                    'Twitter' => array(
-                        'enabled' => $options->getTwitterEnabled(),
-                        'keys' => array(
-                            'key' => $options->getTwitterConsumerKey(),
-                            'secret' => $options->getTwitterConsumerSecret(),
-                        ),
-                    ),
-                    'Yahoo' => array(
-                        'enabled' => $options->getYahooEnabled(),
-                        'keys' => array(
-                            'key' => $options->getYahooClientId(),
-                            'secret' => $options->getYahooSecret(),
-                        ),
-                    ),
-                    'Tumblr' => array(
-                        'enabled' => $options->getTumblrEnabled(),
-                        'keys' => array(
-                            'key' => $options->getTumblrConsumerKey(),
-                            'secret' => $options->getTumblrConsumerSecret(),
-                        ),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_Tumblr',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Tumblr.php'),
-                        ),
-                    ),
-                    'Mailru' => array(
-                        'enabled' => $options->getMailruEnabled(),
-                        'keys' => array(
-                            'id' => $options->getMailruClientId(),
-                            'secret' => $options->getMailruSecret(),
-                        ),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_Mailru',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Mailru.php'),
-                        ),
-                    ),
-                    'Odnoklassniki' => array(
-                        'enabled' => $options->getOdnoklassnikiEnabled(),
-                        'keys' => array(
-                            'id' => $options->getOdnoklassnikiAppId(),
-                            'key' => $options->getOdnoklassnikiKey(),
-                            'secret' => $options->getOdnoklassnikiSecret(),
-                        ),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_Odnoklassniki',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Odnoklassniki.php'),
-                        ),
-                    ),
-                    'Vkontakte' => array(
-                        'enabled' => $options->getVkontakteEnabled(),
-                        'keys' => array(
-                            'id' => $options->getVkontakteAppId(),
-                            'secret' => $options->getVkontakteSecret(),
-                        ),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_Vkontakte',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Vkontakte.php'),
-                        ),
-                    ),
-                    'Yandex' => array(
-                        'enabled' => $options->getYandexEnabled(),
-                        'keys' => array(
-                            'id' => $options->getYandexAppId(),
-                            'secret' => $options->getYandexSecret(),
-                        ),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_Yandex',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Yandex.php'),
-                        ),
-                    ),
-                    'Instagram' => array(
-                        'enabled' => $options->getInstagramEnabled(),
-                        'keys' => array(
-                            'id' => $options->getInstagramClientId(),
-                            'secret' => $options->getInstagramClientSecret(),
-                        ),
-                        'wrapper' => array(
-                            'class' => 'Hybrid_Providers_Instagram',
-                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Instagram.php'),
-                        ),
-                    ),
-                ),
-            )
-        );
-
-        return $hybridAuth;
-    }
-
-    public function getBaseUrl(ServiceLocatorInterface $services)
-    {
-        $router = $services->get('Router');
+        $router = $container->get('Router');
         if (!$router instanceof TreeRouteStack) {
             throw new ServiceNotCreatedException('TreeRouteStack is required to create a fully qualified base url for HybridAuth');
         }
 
-        $request = $services->get('Request');
+        $request = $container->get('Request');
         if (!$router->getRequestUri() && method_exists($request, 'getUri')) {
             $router->setRequestUri($request->getUri());
         }
@@ -198,11 +38,187 @@ class HybridAuthFactory implements FactoryInterface
         }
 
         return $router->assemble(
-            array(),
-            array(
+            [],
+            [
                 'name' => 'scn-social-auth-hauth',
                 'force_canonical' => true,
-            )
+            ]
         );
+    }
+
+    /**
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        // Making sure the SessionManager is initialized
+        // before creating HybridAuth components
+        $sessionManager = $container->get('ScnSocialAuth_ZendSessionManager');
+        $sessionManager->start();
+
+        /* @var $options \ScnSocialAuth\Options\ModuleOptions */
+        $options = $container->get('ScnSocialAuth-ModuleOptions');
+
+        $baseUrl = $this->getBaseUrl($container);
+
+        $hybridAuth = new Hybrid_Auth(
+            [
+                'base_url' => $baseUrl,
+                "debug_mode" => $options->getDebugMode(),
+                "debug_file" => $options->getDebugFile(),
+                'providers' => [
+                    'BitBucket' => [
+                        'enabled' => $options->getBitbucketEnabled(),
+                        'keys' => [
+                            'key' => $options->getBitbucketKey(),
+                            'secret' => $options->getBitbucketSecret(),
+                        ],
+                        'scope' => '',
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_BitBucket',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/BitBucket.php'),
+                        ],
+                    ],
+                    'Facebook' => [
+                        'enabled' => $options->getFacebookEnabled(),
+                        'keys' => [
+                            'id' => $options->getFacebookClientId(),
+                            'secret' => $options->getFacebookSecret(),
+                        ],
+                        'scope' => $options->getFacebookScope(),
+                        'display' => $options->getFacebookDisplay(),
+                        'trustForwarded' => $options->getFacebookTrustForwarded(),
+                    ],
+                    'Foursquare' => [
+                        'enabled' => $options->getFoursquareEnabled(),
+                        'keys' => [
+                            'id' => $options->getFoursquareClientId(),
+                            'secret' => $options->getFoursquareSecret(),
+                        ],
+                    ],
+                    'GitHub' => [
+                        'enabled' => $options->getGithubEnabled(),
+                        'keys' => [
+                            'id' => $options->getGithubClientId(),
+                            'secret' => $options->getGithubSecret(),
+                        ],
+                        'scope' => $options->getGithubScope(),
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_GitHub',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/GitHub.php'),
+                        ],
+                    ],
+                    'Google' => [
+                        'enabled' => $options->getGoogleEnabled(),
+                        'keys' => [
+                            'id' => $options->getGoogleClientId(),
+                            'secret' => $options->getGoogleSecret(),
+                        ],
+                        'scope' => $options->getGoogleScope(),
+                        'hd' => $options->getGoogleHd(),
+                    ],
+                    'LinkedIn' => [
+                        'enabled' => $options->getLinkedInEnabled(),
+                        'keys' => [
+                            'key' => $options->getLinkedInClientId(),
+                            'secret' => $options->getLinkedInSecret(),
+                        ],
+                    ],
+                    'Twitter' => [
+                        'enabled' => $options->getTwitterEnabled(),
+                        'keys' => [
+                            'key' => $options->getTwitterConsumerKey(),
+                            'secret' => $options->getTwitterConsumerSecret(),
+                        ],
+                    ],
+                    'Yahoo' => [
+                        'enabled' => $options->getYahooEnabled(),
+                        'keys' => [
+                            'key' => $options->getYahooClientId(),
+                            'secret' => $options->getYahooSecret(),
+                        ],
+                    ],
+                    'Tumblr' => [
+                        'enabled' => $options->getTumblrEnabled(),
+                        'keys' => [
+                            'key' => $options->getTumblrConsumerKey(),
+                            'secret' => $options->getTumblrConsumerSecret(),
+                        ],
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_Tumblr',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Tumblr.php'),
+                        ],
+                    ],
+                    'Mailru' => [
+                        'enabled' => $options->getMailruEnabled(),
+                        'keys' => [
+                            'id' => $options->getMailruClientId(),
+                            'secret' => $options->getMailruSecret(),
+                        ],
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_Mailru',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Mailru.php'),
+                        ],
+                    ],
+                    'Odnoklassniki' => [
+                        'enabled' => $options->getOdnoklassnikiEnabled(),
+                        'keys' => [
+                            'id' => $options->getOdnoklassnikiAppId(),
+                            'key' => $options->getOdnoklassnikiKey(),
+                            'secret' => $options->getOdnoklassnikiSecret(),
+                        ],
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_Odnoklassniki',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Odnoklassniki.php'),
+                        ],
+                    ],
+                    'Vkontakte' => [
+                        'enabled' => $options->getVkontakteEnabled(),
+                        'keys' => [
+                            'id' => $options->getVkontakteAppId(),
+                            'secret' => $options->getVkontakteSecret(),
+                        ],
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_Vkontakte',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Vkontakte.php'),
+                        ],
+                    ],
+                    'Yandex' => [
+                        'enabled' => $options->getYandexEnabled(),
+                        'keys' => [
+                            'id' => $options->getYandexAppId(),
+                            'secret' => $options->getYandexSecret(),
+                        ],
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_Yandex',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Yandex.php'),
+                        ],
+                    ],
+                    'Instagram' => [
+                        'enabled' => $options->getInstagramEnabled(),
+                        'keys' => [
+                            'id' => $options->getInstagramClientId(),
+                            'secret' => $options->getInstagramClientSecret(),
+                        ],
+                        'wrapper' => [
+                            'class' => 'Hybrid_Providers_Instagram',
+                            'path' => realpath(__DIR__ . '/../HybridAuth/Provider/Instagram.php'),
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        return $hybridAuth;
     }
 }

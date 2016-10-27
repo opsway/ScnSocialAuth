@@ -8,8 +8,11 @@
 
 namespace ScnSocialAuth\Service;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use ZfcUser\Authentication\Adapter\AdapterChainServiceFactory;
 
 /**
@@ -18,16 +21,29 @@ use ZfcUser\Authentication\Adapter\AdapterChainServiceFactory;
  */
 class AuthenticationAdapterChainFactory implements FactoryInterface
 {
-    public function createService(ServiceLocatorInterface $services)
+    /**
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         // Temporarily replace the adapters in the module options with the HybridAuth adapter
-        $zfcUserModuleOptions = $services->get('zfcuser_module_options');
+        $zfcUserModuleOptions = $container->get('zfcuser_module_options');
         $currentAuthAdapters = $zfcUserModuleOptions->getAuthAdapters();
         $zfcUserModuleOptions->setAuthAdapters(array(100 => 'ScnSocialAuth\Authentication\Adapter\HybridAuth'));
 
         // Create a new adapter chain with HybridAuth adapter
         $factory = new AdapterChainServiceFactory();
-        $chain = $factory->createService($services);
+        $chain = $factory($container, null);
 
         // Reset the adapters in the module options
         $zfcUserModuleOptions->setAuthAdapters($currentAuthAdapters);

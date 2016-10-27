@@ -6,7 +6,7 @@ use Hybrid_Auth;
 use ScnSocialAuth\Mapper\UserProviderInterface;
 use ScnSocialAuth\Options\ModuleOptions;
 use Zend\Authentication\Result;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\EventManager\Event;
 use Zend\ServiceManager\ServiceManager;
 use ZfcUser\Authentication\Adapter\AbstractAdapter;
 use ZfcUser\Authentication\Adapter\AdapterChainEvent as AuthEvent;
@@ -17,7 +17,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 
-class HybridAuth extends AbstractAdapter implements ServiceManagerAwareInterface, EventManagerAwareInterface
+class HybridAuth extends AbstractAdapter implements EventManagerAwareInterface
 {
     /**
      * @var Hybrid_Auth
@@ -54,7 +54,7 @@ class HybridAuth extends AbstractAdapter implements ServiceManagerAwareInterface
      */
     protected $events;
 
-    public function authenticate(AuthEvent $authEvent)
+    public function authenticate(Event $authEvent)
     {
         if ($this->isSatisfied()) {
             $storage = $this->getStorage()->read();

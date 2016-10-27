@@ -8,8 +8,12 @@
 
 namespace ScnSocialAuth\Service;
 
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
 use ScnSocialAuth\Controller\UserController;
-use Zend\ServiceManager\FactoryInterface;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
@@ -18,12 +22,25 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class UserControllerFactory implements FactoryInterface
 {
-    public function createService(ServiceLocatorInterface $controllerManager)
+    /**
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $mapper = $controllerManager->getServiceLocator()->get('ScnSocialAuth-UserProviderMapper');
-        $moduleOptions = $controllerManager->getServiceLocator()->get('ScnSocialAuth-ModuleOptions');
-        $redirectCallback = $controllerManager->getServiceLocator()->get('zfcuser_redirect_callback');
-        $zfcuserModuleOptions = $controllerManager->getServiceLocator()->get('zfcuser_module_options');
+        $mapper = $container->get('ScnSocialAuth-UserProviderMapper');
+        $moduleOptions = $container->get('ScnSocialAuth-ModuleOptions');
+        $redirectCallback = $container->get('zfcuser_redirect_callback');
+        $zfcuserModuleOptions = $container->get('zfcuser_module_options');
 
         $controller = new UserController($redirectCallback);
         $controller->setMapper($mapper);
@@ -31,9 +48,9 @@ class UserControllerFactory implements FactoryInterface
         $controller->setZfcModuleOptions($zfcuserModuleOptions);
 
         try {
-          $hybridAuth = $controllerManager->getServiceLocator()->get('HybridAuth');
+          $hybridAuth = $container->get('HybridAuth');
           $controller->setHybridAuth($hybridAuth);
-        } catch (\Zend\ServiceManager\Exception\ServiceNotCreatedException $e) {
+        } catch (ServiceNotCreatedException $e) {
           // This is likely the user cancelling login...
         }
 

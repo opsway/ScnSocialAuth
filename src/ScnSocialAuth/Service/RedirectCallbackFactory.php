@@ -8,9 +8,12 @@
 
 namespace ScnSocialAuth\Service;
 
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
 use ScnSocialAuth\Controller\RedirectCallback;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * @category   ScnSocialAuth
@@ -18,12 +21,25 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  */
 class RedirectCallbackFactory implements FactoryInterface
 {
-  public function createService(ServiceLocatorInterface $serviceLocator)
-  {
-    $router = $serviceLocator->get('Router');
-    $application = $serviceLocator->get('Application');
-    $options = $serviceLocator->get('zfcuser_module_options');
+    /**
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        $router = $container->get('Router');
+        $application = $container->get('Application');
+        $options = $container->get('zfcuser_module_options');
 
-    return new RedirectCallback($application, $router, $options);
-  }
+        return new RedirectCallback($application, $router, $options);
+    }
 }
