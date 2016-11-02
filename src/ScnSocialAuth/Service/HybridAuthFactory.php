@@ -42,6 +42,7 @@ class HybridAuthFactory implements FactoryInterface
             [
                 'name' => 'scn-social-auth-hauth',
                 'force_canonical' => true,
+                'query' => ['utm_nooverride' => 1],
             ]
         );
     }

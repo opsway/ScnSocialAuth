@@ -112,6 +112,7 @@ class UserController extends AbstractActionController
         if ($this->getZfcModuleOptions()->getUseRedirectParameterIfPresent() && $this->getRequest()->getQuery()->get('redirect')) {
             $query = array('redirect' => $this->getRequest()->getQuery()->get('redirect'));
         }
+        $query = array_merge($query, ['utm_nooverride' => 1]);
         $redirectUrl = $this->url()->fromRoute('scn-social-auth-user/authenticate/provider', array('provider' => $provider), array('query' => $query));
 
         $adapter = $hybridAuth->authenticate(
