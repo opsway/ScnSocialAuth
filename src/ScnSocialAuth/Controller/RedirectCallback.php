@@ -53,7 +53,7 @@ class RedirectCallback
         $redirect = $this->getRedirect($routeMatch->getMatchedRouteName(), $this->getRedirectRouteFromRequest());
 
         $response = $this->application->getResponse();
-        $response->getHeaders()->addHeaderLine('Location', $redirect);
+        $response->getHeaders()->addHeaderLine('Location', $redirect.'?utm_nooverride=1');
         $response->setStatusCode(302);
 
         return $response;
